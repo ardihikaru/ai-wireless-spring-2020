@@ -22,6 +22,7 @@ classdef APC
         % APC related parameters
 %         similarity_matrix;
         similarity_matrix = {};
+        similarity_matrix_min = 999.0;  % default value
     end
     methods
         function self = APC(ue_num, uav_num, Rx_signal_All, Rx_interfer_All)
@@ -52,6 +53,7 @@ classdef APC
             
             [row_num, col_num] = size(self.norm_rx_signal);
             
+            % [1.1] Calculate non-diagonal values
             for col = 1:col_num
                 ue_in_this_uav = [];
                 for row = 1:row_num
@@ -60,7 +62,7 @@ classdef APC
                     signal_data = self.norm_rx_signal(row, col);
                     
                     if signal_data ~= 0
-                        disp("@Row=" + row + "; Col=" + col + "; Data=" + signal_data)
+%                         disp("@Row=" + row + "; Col=" + col + "; Data=" + signal_data)
                         
                         % push list of UEs in this UAV cluster
                         ue_in_this_uav(end+1) = row;
@@ -70,7 +72,17 @@ classdef APC
                 % find any interference with other UAVs, 
                 % then, calculate SUM of any interferences value
                 self = self.calc_sum_interfer(ue_in_this_uav, col, col_num);
-                disp("...")
+%                 disp("...")
+            end
+            
+            % [1.2] Calculate diagonal values
+            self = self.set_diagonal_values();
+            disp(" >>> FINAL self.similarity_matrix_min:" + self.similarity_matrix_min)
+        end
+        
+        function self = set_diagonal_values(self)
+            for diagonal_idx = 1:self.uav_num
+                self.similarity_matrix{diagonal_idx, diagonal_idx} = self.similarity_matrix_min;
             end
         end
         
@@ -92,13 +104,19 @@ classdef APC
                     end
                 end
                 
-                disp("@ source_col=" + source_col + "; col=" + col + "; FINAL sum_interfer:" + sum_interfer)
+%                 disp("@ source_col=" + source_col + "; col=" + col + "; FINAL sum_interfer:" + sum_interfer)
                 % push SUM interfence for this UAV (col)
                 if sum_interfer ~= 0
                     if source_col == col
                         self.similarity_matrix{source_col, col} = 0.0;
                     else
                         self.similarity_matrix{source_col, col} = sum_interfer;
+                        
+                        % Calculate min. `sum_interfer` value
+%                         disp(" --- self.similarity_matrix_min VS sum: " + self.similarity_matrix_min + " -- " + sum_interfer)
+                        if self.similarity_matrix_min > sum_interfer
+                            self.similarity_matrix_min = sum_interfer;
+                        end
                     end
                 end
             end
