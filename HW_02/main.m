@@ -24,14 +24,17 @@ Standby_sleep = 4.3; %Sleep mode
 H = 10; %High(m)
 
 %User Data
+% Homework: 12 UAVs and 60 UEs
 group = 12; %The number of user mobile pattern
 num_per_group = 5; % UE per Group
+
 ue_loc_total_x = csvread('ue_loc_total_x_DSC_12.csv');
 ue_loc_total_y = csvread('ue_loc_total_y_DSC_12.csv');
 ue_num = group * num_per_group;
 
 
-Simulation_time = 360; 
+%Simulation_time = 360; 
+Simulation_time = 10; 
 time_interval = 10; %Collect data every 10s
 runtime = Simulation_time/time_interval;
 for time_slot = 1 : runtime 
@@ -79,17 +82,25 @@ for time_slot = 1 : runtime
     [SINR_All(time_slot,:), datarate_All(time_slot,:), C_All(time_slot,:)] = All_Capacity(Rx_signal_All, Rx_interfer_All, ue_num, W, N0);     
     SINR_All_dB(time_slot,:) = 10*log10(SINR_All(time_slot,:));   
     
-    %% We hope you to build the code of APC power control and evaluate the performance (total system throughput) in this homework.
-      % cluster_center = [];
-      % [cluster_center] = APC(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
-      % 
-      % n(cluster_center) = 0; % n: the # of served users per cell 
-      % bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
-      % Rx_power_APC = RSRP_total_intuitive(:,n ~= 0); %只留有服務ue的cell
-      % [Rx_signal_APC, Rx_interfer_APC,n_APC] = Rx_signal_interference(ue_num, bs_loc_intuitive_APC, Rx_power_APC); % n_APC : 每個cell服務的user數量
-      % [SINR_APC(time_slot,:), datarate_APC(time_slot,:), C_APC(time_slot,:)] = All_Capacity(Rx_signal_APC, Rx_interfer_APC, ue_num, W, N0);    
-      % SINR_APC_dB(time_slot,:) = 10*log10(SINR_APC(time_slot,:));
-    
+    % We hope you to build the code of APC power control and evaluate the performance (total system throughput) in this homework.
+    %{
+        Input parameter detail:
+        `ue_num` represents as Total number of UEs; expected 60 UEs
+        `length(bs_loc_intuitive)` represents as Total number of UAVs; expected 12 UAVs
+        `Rx_signal_All` represents as Received UE signals in each UAV;
+        `Rx_interfer_All` represents as Captured signal interferences in each UAV;
+    %}
+    apc = APC(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
+    apc = apc.run(); % executes APC algorithm
+    cluster_center = apc.get_cluster_center;
+       
+%     n(cluster_center) = 0; % n: the # of served users per cell 
+%     bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
+%     Rx_power_APC = RSRP_total_intuitive(:,n ~= 0); %只留有服務ue的cell
+%     [Rx_signal_APC, Rx_interfer_APC,n_APC] = Rx_signal_interference(ue_num, bs_loc_intuitive_APC, Rx_power_APC); % n_APC : 每個cell服務的user數量
+%     [SINR_APC(time_slot,:), datarate_APC(time_slot,:), C_APC(time_slot,:)] = All_Capacity(Rx_signal_APC, Rx_interfer_APC, ue_num, W, N0);    
+%     SINR_APC_dB(time_slot,:) = 10*log10(SINR_APC(time_slot,:));
+   
 end
 
 C_all_on_avg = mean(C_All); %baseline: total system throughput in average.
