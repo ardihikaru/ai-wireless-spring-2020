@@ -31,13 +31,12 @@ classdef APC
             self.Rx_signal_All   = Rx_signal_All;
             self.Rx_interfer_All = Rx_interfer_All;
             
-            % default value 
+            % set default value 
             self.similarity_matrix{1, 1} = 0.0;
         end
         
+        % This function executes calculation of APC algorithm
         function self = run(self)
-            % This function executes calculation of APC algorithm
-            
             % Normalize values (easier to understand)
             self = self.normalize_rx_signal();
             self = self.normalize_rx_interfer();
