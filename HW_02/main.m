@@ -93,6 +93,10 @@ for time_slot = 1 : runtime
     apc = APC(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
     apc = apc.run(); % executes APC algorithm
     cluster_center = apc.get_cluster_center;
+    normalized_rx_signal = apc.get_norm_rx_signal;
+    normalized_rx_interfer = apc.get_norm_rx_interfer;
+    similarity_matrix = apc.get_similarity_matrix;
+%     normalized_rx_interfer = apc.get_norm_rx_interfer;
        
 %     n(cluster_center) = 0; % n: the # of served users per cell 
 %     bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
