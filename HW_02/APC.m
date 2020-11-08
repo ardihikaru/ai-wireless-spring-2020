@@ -18,19 +18,23 @@ classdef APC
         norm_rx_signal;
         norm_rx_interfer;
         cluster_center = [];
+        n_iters;
         
         % APC related parameters
-%         similarity_matrix;
         similarity_matrix = {};
         similarity_matrix_min = 999.0;  % default value
+        
+        % RESTful API endpoints
+        url_apc_orig = "http://localhost:8085/algorithm/apc/original";
     end
     methods
-        function self = APC(ue_num, uav_num, Rx_signal_All, Rx_interfer_All)
+        function self = APC(ue_num, uav_num, Rx_signal_All, Rx_interfer_All, n_iters)
             % class constructor
             self.ue_num          = ue_num;
             self.uav_num         = uav_num;
             self.Rx_signal_All   = Rx_signal_All;
             self.Rx_interfer_All = Rx_interfer_All;
+            self.n_iters         = n_iters;
             
             % set default value 
             self.similarity_matrix{1, 1} = 0.0;
@@ -45,7 +49,30 @@ classdef APC
             % Calculate similarity matrix
             self = self.calculate_similarity_matrix();
             
-            self.cluster_center = [1, 2, 5];
+            % call Restful API
+            self = self.send_post_request();
+            
+            % Calculate responsibility matrix
+%             self = self.calculate_responsibility_matrix();
+            
+            % Calculate with original APC algorithm
+%             self = self.perform_original_apc();
+            
+%             self.cluster_center = [1, 2, 5];
+        end
+        
+        function self = send_post_request(self)
+            options = weboptions('RequestMethod','post', 'MediaType','application/json');
+%             Body = struct('similarity_matrix', cell2mat(self.similarity_matrix));
+            Body = struct( ...
+                "algorithm", "apc", ... 
+                "n_iters", 100, ...
+                "similarity_matrix", cell2mat(self.similarity_matrix) ...
+            );
+            response = webwrite(self.url_apc_orig, Body, options);
+            col_wise_cluster_head = response.data;
+            self.cluster_center = col_wise_cluster_head.';  % convert into row-wise array
+            self.cluster_center
         end
         
         function self = calculate_similarity_matrix(self)
@@ -77,7 +104,7 @@ classdef APC
             
             % [1.2] Calculate diagonal values
             self = self.set_diagonal_values();
-            disp(" >>> FINAL self.similarity_matrix_min:" + self.similarity_matrix_min)
+%             disp(" >>> FINAL self.similarity_matrix_min:" + self.similarity_matrix_min)
         end
         
         function self = set_diagonal_values(self)

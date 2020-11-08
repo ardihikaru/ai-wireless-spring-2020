@@ -33,6 +33,7 @@ ue_loc_total_y = csvread('ue_loc_total_y_DSC_12.csv');
 ue_num = group * num_per_group;
 
 
+%Simulation_time = 720; 
 %Simulation_time = 360; 
 Simulation_time = 10; 
 time_interval = 10; %Collect data every 10s
@@ -89,26 +90,30 @@ for time_slot = 1 : runtime
         `length(bs_loc_intuitive)` represents as Total number of UAVs; expected 12 UAVs
         `Rx_signal_All` represents as Received UE signals in each UAV;
         `Rx_interfer_All` represents as Captured signal interferences in each UAV;
+        `n_iters` represents as Total iteration to run APC algorithm;
     %}
-    apc = APC(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
+    n_iters = 2000;
+    apc = APC(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All, n_iters);
     apc = apc.run(); % executes APC algorithm
     cluster_center = apc.get_cluster_center;
-    normalized_rx_signal = apc.get_norm_rx_signal;
-    normalized_rx_interfer = apc.get_norm_rx_interfer;
+%     normalized_rx_signal = apc.get_norm_rx_signal;
+%     normalized_rx_interfer = apc.get_norm_rx_interfer;
     similarity_matrix = apc.get_similarity_matrix;
+    csvwrite('similarity_matrix.txt', similarity_matrix)
+    csvwrite('adapt_apV3/similarity_matrix.txt', similarity_matrix)
 %     normalized_rx_interfer = apc.get_norm_rx_interfer;
        
-%     n(cluster_center) = 0; % n: the # of served users per cell 
-%     bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
-%     Rx_power_APC = RSRP_total_intuitive(:,n ~= 0); %只留有服務ue的cell
-%     [Rx_signal_APC, Rx_interfer_APC,n_APC] = Rx_signal_interference(ue_num, bs_loc_intuitive_APC, Rx_power_APC); % n_APC : 每個cell服務的user數量
-%     [SINR_APC(time_slot,:), datarate_APC(time_slot,:), C_APC(time_slot,:)] = All_Capacity(Rx_signal_APC, Rx_interfer_APC, ue_num, W, N0);    
-%     SINR_APC_dB(time_slot,:) = 10*log10(SINR_APC(time_slot,:));
+    n(cluster_center) = 0; % n: the # of served users per cell 
+    bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
+    Rx_power_APC = RSRP_total_intuitive(:,n ~= 0); %只留有服務ue的cell
+    [Rx_signal_APC, Rx_interfer_APC,n_APC] = Rx_signal_interference(ue_num, bs_loc_intuitive_APC, Rx_power_APC); % n_APC : 每個cell服務的user數量
+    [SINR_APC(time_slot,:), datarate_APC(time_slot,:), C_APC(time_slot,:)] = All_Capacity(Rx_signal_APC, Rx_interfer_APC, ue_num, W, N0);    
+    SINR_APC_dB(time_slot,:) = 10*log10(SINR_APC(time_slot,:));
    
 end
 
 C_all_on_avg = mean(C_All); %baseline: total system throughput in average.
-%C_APC_avg = mean(C_APC); %APC: total system throughput in average.
+C_APC_avg = mean(C_APC); %APC: total system throughput in average.
 
 
    
