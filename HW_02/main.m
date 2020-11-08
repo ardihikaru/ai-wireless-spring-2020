@@ -34,8 +34,8 @@ ue_num = group * num_per_group;
 
 
 %Simulation_time = 720; 
-%Simulation_time = 360; 
-Simulation_time = 10; 
+Simulation_time = 360; 
+%Simulation_time = 10; 
 time_interval = 10; %Collect data every 10s
 runtime = Simulation_time/time_interval;
 for time_slot = 1 : runtime 
@@ -92,21 +92,25 @@ for time_slot = 1 : runtime
         `Rx_interfer_All` represents as Captured signal interferences in each UAV;
         `n_iters` represents as Total iteration to run APC algorithm;
     %}
-    n_iters = 2000;
-    apc = APC(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All, n_iters);
-    apc = apc.run(); % executes APC algorithm
-    cluster_center = apc.get_cluster_center;
-%     normalized_rx_signal = apc.get_norm_rx_signal;
-%     normalized_rx_interfer = apc.get_norm_rx_interfer;
-    similarity_matrix = apc.get_similarity_matrix;
-    csvwrite('similarity_matrix.txt', similarity_matrix)
-    csvwrite('adapt_apV3/similarity_matrix.txt', similarity_matrix)
-%     normalized_rx_interfer = apc.get_norm_rx_interfer;
+%     n_iters = 2000;
+    builder = SimilarityMatrixBuilder(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
+    builder = builder.run(); % executes APC algorithm
+    similarity_matrix = builder.get_similarity_matrix;
+%     similarity_matrix
+    
+%     csvwrite('similarity_matrix.txt', similarity_matrix)
+    
+    % running APC algorithm
+%     simatrix = 1;   % 0: data as input; 1: similarity matrix as input
+%     exec_apc_original
+    
+%     cluster_center = [1 3 5];
+    cluster_center = apc_algorithm();
        
     n(cluster_center) = 0; % n: the # of served users per cell 
     bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
-    Rx_power_APC = RSRP_total_intuitive(:,n ~= 0); %只留有服務ue的cell
-    [Rx_signal_APC, Rx_interfer_APC,n_APC] = Rx_signal_interference(ue_num, bs_loc_intuitive_APC, Rx_power_APC); % n_APC : 每個cell服務的user數量
+    Rx_power_APC = RSRP_total_intuitive(:,n ~= 0);
+    [Rx_signal_APC, Rx_interfer_APC,n_APC] = Rx_signal_interference(ue_num, bs_loc_intuitive_APC, Rx_power_APC); % n_APC 
     [SINR_APC(time_slot,:), datarate_APC(time_slot,:), C_APC(time_slot,:)] = All_Capacity(Rx_signal_APC, Rx_interfer_APC, ue_num, W, N0);    
     SINR_APC_dB(time_slot,:) = 10*log10(SINR_APC(time_slot,:));
    
