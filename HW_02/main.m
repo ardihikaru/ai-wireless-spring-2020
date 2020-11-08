@@ -94,18 +94,11 @@ for time_slot = 1 : runtime
     %}
 %     n_iters = 2000;
     builder = SimilarityMatrixBuilder(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
-    builder = builder.run(); % executes APC algorithm
+    builder = builder.run(); 
     similarity_matrix = builder.get_similarity_matrix;
-%     similarity_matrix
     
-%     csvwrite('similarity_matrix.txt', similarity_matrix)
-    
-    % running APC algorithm
-%     simatrix = 1;   % 0: data as input; 1: similarity matrix as input
-%     exec_apc_original
-    
-%     cluster_center = [1 3 5];
-    cluster_center = apc_algorithm();
+    % executes APC algorithm
+    cluster_center = apc_algorithm(similarity_matrix);
        
     n(cluster_center) = 0; % n: the # of served users per cell 
     bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
