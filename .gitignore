@@ -1,2 +1,5 @@
 # ignore editor
-.idea/
+HW_02/pyserver/.idea/
+
+# ignore python cache
+*.pyc
