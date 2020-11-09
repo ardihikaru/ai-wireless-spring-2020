@@ -1,6 +1,8 @@
 function [M, dmax, Dist] = apc_simatrix_make(data,type,nrow)
 %   data:    a matrix with each column representing a variable.
 
+disp(" #### apc_simatrix_make ..")
+
 if type == 1
     [Dist, dmax] = apc_similarity_euclid(data,2);   %  pdist(data,'type');
 elseif type == 2
@@ -15,6 +17,7 @@ else
 end
 
 nap = nrow*nrow-nrow;
+disp(">>>> nap:" + nap)
 M = zeros(nap,3);
 j = 1;
 for i=1:nrow

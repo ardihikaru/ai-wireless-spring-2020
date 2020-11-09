@@ -33,7 +33,7 @@ ue_loc_total_y = csvread('ue_loc_total_y_DSC_12.csv');
 ue_num = group * num_per_group;
 
 
-%Simulation_time = 720; 
+% Simulation_time = 720; 
 Simulation_time = 360; 
 %Simulation_time = 10; 
 time_interval = 10; %Collect data every 10s
@@ -70,7 +70,7 @@ for time_slot = 1 : runtime
     %hold on
     %axis equal
     grid on; 
-       
+    
     %All_on ; RSRP[ue_number, cell_number]
     RSRP_total_intuitive = zeros(length(ue_loc),length(bs_loc_intuitive));
     for j = 1:length(ue_loc)
