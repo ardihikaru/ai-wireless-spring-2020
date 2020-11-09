@@ -269,7 +269,17 @@ while ~dn
         drawnow; 
     end;
 end;
-I=find(diag(A+R)>0); K=length(I); % Identify exemplars
+
+% find cluster head
+possible_heads = diag(A+R);
+I=find(diag(A+R)>0);
+found_heads = possible_heads(I);
+smallest_head = min(found_heads);
+% remove cluster head with lowest Criterion value
+possible_heads(possible_heads==smallest_head) = [];
+
+% I=find(diag(A+R)>0); K=length(I); % Identify exemplars
+I=find(possible_heads>0); K=length(I); % Identify exemplars
 if K>0
     [tmp c]=max(S(:,I),[],2); c(I)=1:K; % Identify clusters
     % Refine the final set of exemplars and clusters and return results

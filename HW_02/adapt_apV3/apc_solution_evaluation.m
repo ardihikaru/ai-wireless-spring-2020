@@ -43,7 +43,7 @@ for i = 1:dim
     end
     dn = isfinite(Smax);
     Sil(i) = mean(Smax(dn));
-    [C, Y, dmax] = ind2cluster(Y);
+    [C, Y, dmax] = apc_ind2cluster(Y);  % calculate Criterion (c)
     dmax = min(dmax);
     Sildelete(i) = dmax < cut;
     Q =[];
