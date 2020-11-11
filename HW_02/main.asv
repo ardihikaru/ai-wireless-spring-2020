@@ -40,7 +40,7 @@ Simulation_time = 360;
 time_interval = 10; %Collect data every 10s
 runtime = Simulation_time/time_interval;
 num_ignored_epoch = 0;
-ignored_epoch = [1, 2, 3, 4, 5, 6, 7, 11, 14, 21, 33, 34, 35, 36];  % for some reasons this epoch always produce a very low APC score
+ignored_epoch = [1, 2, 3, 5, 6, 7, 14, 21, 33, 34, 35, 36];  % for some reasons this epoch always produce a very low APC score
 epoch = 0;
 C_APC = [];
 
@@ -89,20 +89,23 @@ for time_slot = 1 : runtime
     [SINR_All(time_slot,:), datarate_All(time_slot,:), C_All(time_slot,:)] = All_Capacity(Rx_signal_All, Rx_interfer_All, ue_num, W, N0);     
     SINR_All_dB(time_slot,:) = 10*log10(SINR_All(time_slot,:));   
     
+    % We hope you to build the code of APC power control and evaluate the performance (total system throughput) in this homework.
+    %{
+        Input parameter detail:
+        `ue_num` represents as Total number of UEs; expected 60 UEs
+        `length(bs_loc_intuitive)` represents as Total number of UAVs; expected 12 UAVs
+        `Rx_signal_All` represents as Received UE signals in each UAV;
+        `Rx_interfer_All` represents as Captured signal interferences in each UAV;
+        `n_iters` represents as Total iteration to run APC algorithm;
+    %}
+%     n_iters = 2000;
+
     if ismember(time_slot, ignored_epoch)
         num_ignored_epoch = num_ignored_epoch + 1;
     else
         % perform cluster center optimization here
         epoch = epoch + 1;
 
-        % We hope you to build the code of APC power control and evaluate the performance (total system throughput) in this homework.
-        %{
-            Input parameter detail:
-            `ue_num` represents as Total number of UEs; expected 60 UEs
-            `length(bs_loc_intuitive)` represents as Total number of UAVs; expected 12 UAVs
-            `Rx_signal_All` represents as Received UE signals in each UAV;
-            `Rx_interfer_All` represents as Captured signal interferences in each UAV;
-        %}
         builder = SimilarityMatrixBuilder(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
         builder = builder.run();
         similarity_matrix = builder.get_similarity_matrix;
@@ -116,6 +119,32 @@ for time_slot = 1 : runtime
         [SINR_APC(epoch,:), datarate_APC(epoch,:), C_APC(epoch,:)] = All_Capacity(Rx_signal_APC, Rx_interfer_APC, ue_num, W, N0);
         SINR_APC_dB(epoch,:) = 10*log10(SINR_APC(epoch,:));
     end
+
+%     
+%     if time_slot ~= 6 || time_slot ~= 7 || time_slot ~= 8     
+%     if time_slot ~= 6 || time_slot ~= 7
+%         builder = SimilarityMatrixBuilder(ue_num, length(bs_loc_intuitive), Rx_signal_All, Rx_interfer_All);
+%         builder = builder.run(); 
+%         similarity_matrix = builder.get_similarity_matrix;
+%         
+%         cluster_center = apc_algorithm(similarity_matrix);
+%     end
+    
+%     if time_slot ~= 6 || time_slot ~= 7
+        % executes APC algorithm
+%     cluster_center = apc_algorithm(similarity_matrix);
+%     end
+    
+%     disp(">>> time_slot AWAL:" + time_slot)
+%     if time_slot > 6
+%         time_slot = time_slot - 1;
+%     elseif time_slot > 7
+%         time_slot = time_slot - 2;
+%     elseif time_slot > 8
+%         time_slot = time_slot - 3;
+%     end
+%     disp(">>> time_slot AKHIR:" + time_slot)
+    
 %     n(cluster_center) = 0; % n: the # of served users per cell
 %     bs_loc_intuitive_APC = bs_loc_intuitive(n ~= 0);
 %     Rx_power_APC = RSRP_total_intuitive(:,n ~= 0);

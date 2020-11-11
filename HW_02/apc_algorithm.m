@@ -8,7 +8,7 @@ function cluster_center = apc_algorithm(sim_matrix)
 % clear;
 cluster_center = [];
 nrun2 = 20000;   % max iteration times for original AP
-nconv = 80;     % convergence condition, default 50
+nconv = 20;     % convergence condition, default 50
 lam = 0.8;      % damping factor, default 0.5
 cut = 3;        % after clustering, drop an cluster with number of samples < cut
 %splot = 'plot'; % observing a clustering process when it is on
@@ -32,18 +32,18 @@ disp(' '); disp(['==> Clustering is running on Similarity Matrix, please wait ..
 tic;
 
 % create row based similarity matrix
-nap = nrow*nrow-nrow;
-M = zeros(nap,3);
-m_idx = 0;
-for row = 1:nrow
-    for col = 1:nrow
-        if col ~= row
-            m_idx = m_idx + 1;
-            M(m_idx,:) = [ row; col; data(row, col) ];
-        end
-    end
-end
-% M = apc_simatrix_make(data,type,nrow);
+% nap = nrow*nrow-nrow;
+% M = zeros(nap,3);
+% m_idx = 0;
+% for row = 1:nrow
+%     for col = 1:nrow
+%         if col ~= row
+%             m_idx = m_idx + 1;
+%             M(m_idx,:) = [ row; col; data(row, col) ];
+%         end
+%     end
+% end
+M = apc_simatrix_make(data,type,nrow);
 
 dn = find(M(:,3)>-realmax);
 p = median(M(dn,3));         % Set preference to similarity median
